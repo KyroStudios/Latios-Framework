@@ -263,7 +263,7 @@ namespace Latios.Psyshock
                     {
                         aContactNormalInBSpace = math.normalize(distanceResult.normalA - distanceResult.normalB);
                     }
-                    aContactNormalInBSpace = math.InverseRotateFast(boxTransform.rot, aContactNormalInBSpace);
+                    aContactNormalInBSpace = MathematicsExtensions.InverseRotateFast(boxTransform.rot, aContactNormalInBSpace);
                     usesContactDir         = true;
                     break;
                 }
@@ -409,7 +409,7 @@ namespace Latios.Psyshock
                         aContactNormalInBSpace = math.normalize(distanceResult.normalA - distanceResult.normalB);
                     }
                     aContactNormalInBSpace = math.select(aContactNormalInBSpace, -aContactNormalInBSpace, math.dot(aContactNormalInBSpace, distanceResult.normalB) > 0f);
-                    aContactNormalInBSpace = math.InverseRotateFast(boxTransform.rot, aContactNormalInBSpace);
+                    aContactNormalInBSpace = MathematicsExtensions.InverseRotateFast(boxTransform.rot, aContactNormalInBSpace);
                     result                 = default;
                 }
             }

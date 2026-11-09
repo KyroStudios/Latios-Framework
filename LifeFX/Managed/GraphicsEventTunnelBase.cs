@@ -38,7 +38,7 @@ namespace Latios.LifeFX
 
             var sa        = stackalloc Unity.Entities.Hash128[2];
             var array     = CollectionHelper.ConvertExistingDataToNativeArray<Unity.Entities.Hash128>(sa, 2, Allocator.None, true);
-            var guidArray = array.GetSubArray(0, 1).Reinterpret<UnityEditor.GUID>();
+            var guidArray = array.GetSubArray(0, 1).Reinterpret<UnityEngine.GUID>();
             guidArray[0] = default;
 #if UNITY_6000_3_OR_NEWER
             var instanceIdArray = array.GetSubArray(1, 1).Reinterpret<EntityId>(16).GetSubArray(0, 1);

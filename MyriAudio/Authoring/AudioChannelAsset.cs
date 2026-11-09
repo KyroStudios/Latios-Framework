@@ -17,9 +17,9 @@ namespace Latios.Myri
             guidArray[0]  = default;
 #if UNITY_6000_3_OR_NEWER
             var entityIdArray = array.GetSubArray(1, 1).Reinterpret<EntityId>(16).GetSubArray(0, 1);
-            entityIdArray[0] = GetInstanceID();
+            entityIdArray[0] = GetEntityId();
 #if UNITY_EDITOR
-            UnityEditor.AssetDatabase.EntityIdsToGUIDs(entityIdArray, guidArray.Reinterpret<UnityEditor.GUID>());
+            UnityEditor.AssetDatabase.EntityIdsToGUIDs(entityIdArray, guidArray.Reinterpret<UnityEngine.GUID>());
 #endif
 #else
             var instanceIdArray = array.GetSubArray(1, 1).Reinterpret<int>(16).GetSubArray(0, 1);

@@ -18,7 +18,7 @@ namespace Latios.Psyshock
 
         public static bool DistanceBetween(float3 point, in TriMeshCollider triMesh, in RigidTransform triMeshTransform, float maxDistance, out PointDistanceResult result)
         {
-            var pointInTriMesh = math.InverseTransformFast(in triMeshTransform, point);
+            var pointInTriMesh = MathematicsExtensions.InverseTransformFast(in triMeshTransform, point);
             var aabb           = Physics.AabbFrom(pointInTriMesh - maxDistance, pointInTriMesh + maxDistance);
             var processor      = new PointProcessor
             {

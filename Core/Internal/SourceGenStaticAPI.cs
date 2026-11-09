@@ -34,6 +34,7 @@ namespace Latios.InternalSourceGen
             public void* ptr;
         }
 
+        [System.Runtime.InteropServices.UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
         public delegate void BurstDispatchCollectionComponentDelegate(ContextPtr context, int operation);
 
         public static void BurstDispatchCollectionComponent<T>(ContextPtr context, int operation) where T : unmanaged, ICollectionComponentSourceGenerated, ICollectionComponent

@@ -411,9 +411,9 @@ namespace Latios.Transforms
 
         #region LinkedEntityGroup
         public static Span<Entity> GetHierarchyEntitiesInLeg(ref ThreadStackAllocator tsa,
-                                                             ReadOnlySpan<EntityInHierarchy> hierarchy,
-                                                             ReadOnlySpan<Entity>            oldLeg,
-                                                             out bool matchedAll)
+                                                     ReadOnlySpan<EntityInHierarchy> hierarchy,
+                                                     NativeArray<Entity>              oldLeg,
+                                                     out bool matchedAll)
         {
             var required     = math.min(hierarchy.Length, oldLeg.Length);
             var resultBuffer = tsa.AllocateAsSpan<Entity>(required);

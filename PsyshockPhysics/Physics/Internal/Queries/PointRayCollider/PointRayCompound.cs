@@ -153,7 +153,7 @@ namespace Latios.Psyshock
                                           in RigidTransform compoundTransform,
                                           float maxDistance)
             {
-                var queryInCompoundSpace = math.InverseTransformFast(in compoundTransform, in queryTransform);
+                var queryInCompoundSpace = MathematicsExtensions.InverseTransformFast(in compoundTransform, in queryTransform);
                 var queryAabb            = Physics.AabbFrom(in queryCollider, queryInCompoundSpace);
                 // queryAabb right now is a worldQuery, and we need to solve a localQuery based on the following:
                 // worldCenter = localCenter * scale * stretch

@@ -70,7 +70,7 @@ namespace Latios.Transforms
 #if UNITY_EDITOR
     public partial class GameObjectEntityHostAuthoring
     {
-        int m_editorInstanceId;
+        UnityEngine.EntityId m_editorInstanceId;
         UnityEngine.Hash128 m_editorCachedGuid;
 
         void Reset() => OnValidate();
@@ -105,12 +105,12 @@ namespace Latios.Transforms
             }
 
             m_editorCachedGuid = m_guid;
-            m_editorInstanceId = GetInstanceID();
+            m_editorInstanceId = GetEntityId();
         }
 
         bool IsDuplicate()
         {
-            return gameObject.scene.isLoaded && !guid.Equals(default) && m_editorInstanceId != GetInstanceID();
+            return gameObject.scene.isLoaded && !guid.Equals(default) && m_editorInstanceId != GetEntityId();
         }
 
         bool IsReverted()

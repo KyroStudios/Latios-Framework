@@ -258,8 +258,8 @@ namespace Latios.Kinemation.Systems
             IncludeExcludeListFilter includeExcludeListFilter = new IncludeExcludeListFilter(
                 entityManager,
 #if UNITY_6000_3_OR_NEWER
-                includeEntityIndices.Reinterpret<int>(),
-                excludeEntityIndices.Reinterpret<int>(),
+                includeEntityIndices,
+                excludeEntityIndices,
 #else
                 includeEntityIndices,
                 excludeEntityIndices,

@@ -179,8 +179,8 @@ namespace Latios.Psyshock
             var futureTransformB = IntegrateWithoutDamping(inertialPoseWorldTransformB, in velocityB, deltaTime);
 
             float3 axisInWorld = math.mul(inertialPoseWorldTransformB.rot, parameters.axisInB);
-            float3 angA        = math.cross(parameters.jointPositionInInertialPoseASpace, math.InverseRotateFast(futureTransformA.rot, axisInWorld));
-            float3 angB        = math.cross(parameters.jointPositionInInertialPoseBSpace, math.InverseRotateFast(futureTransformB.rot, axisInWorld));
+            float3 angA        = math.cross(parameters.jointPositionInInertialPoseASpace, MathematicsExtensions.InverseRotateFast(futureTransformA.rot, axisInWorld));
+            float3 angB        = math.cross(parameters.jointPositionInInertialPoseBSpace, MathematicsExtensions.InverseRotateFast(futureTransformB.rot, axisInWorld));
 
             float invEffectiveMass = massA.inverseMass + math.csum(angA * angA * massA.inverseInertia) +
                                      massB.inverseMass + math.csum(angB * angB * massB.inverseInertia);

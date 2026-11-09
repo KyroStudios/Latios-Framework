@@ -190,7 +190,7 @@ namespace Latios.Psyshock
             UnitySim.ContactsBetweenResult result = default;
             result.contactNormal                  = distanceResult.normalB;
 
-            var triangleLocalContactNormal = math.InverseRotateFast(triangleTransform.rot, -distanceResult.normalB);
+            var triangleLocalContactNormal = MathematicsExtensions.InverseRotateFast(triangleTransform.rot, -distanceResult.normalB);
             PointRayTriangle.BestFacePlanesAndVertices(in triangle, triangleLocalContactNormal, out var edgePlaneNormals, out var edgePlaneDistances, out var plane, out _);
 
             bool needsClosestPoint = math.abs(math.dot(triangleLocalContactNormal, plane.normal)) < 0.05f;
@@ -336,10 +336,14 @@ namespace Latios.Psyshock
             // A triangle vertex is only closest when both its edges end up getting clamped to it when computing the nearest point.
             bool4 vertexValids = (isEdgeStart & isEdgeEnd.zxyz) | (isEdgeEnd & isEdgeStart.yzxy);
             // Edge hitpoints when the capsule axis is outside are only valid if it hits a valid vertex or is outside or on the edge not on a vertex.
-            bool4 unpiercedEdgesValids = math.select(edgePreciseDotEdgeNormals <= 0f, vertexValids, isEdgeStart | isEdgeEnd);
+            bool4 unpiercedEdgesValids =
+    ((isEdgeStart | isEdgeEnd) & vertexValids) |
+    (!(isEdgeStart | isEdgeEnd) & (edgePreciseDotEdgeNormals <= 0f));
             // Edge hitpoints when the capsule axis pierces are only valid if the hitpoint is not on an edge endpoint.
             bool4 piercedEdgesValids = !(isEdgeStart | isEdgeEnd | isAxisStart | isAxisEnd);
-            bool4 edgeValids         = math.select(unpiercedEdgesValids, piercedEdgesValids, pierced);
+            bool4 edgeValids =
+    (pierced & piercedEdgesValids) |
+    (!pierced & unpiercedEdgesValids);
 
             bool faceValid = aFaceValid || bFaceValid;
             // If rounding causes us to rule out all candidates, make all edges candidates
@@ -466,10 +470,14 @@ namespace Latios.Psyshock
             // A triangle vertex is only closest when both its edges end up getting clamped to it when computing the nearest point.
             bool4 vertexValids = (isEdgeStart & isEdgeEnd.zxyz) | (isEdgeEnd & isEdgeStart.yzxy);
             // Edge hitpoints when the capsule axis is outside are only valid if it hits a valid vertex or is outside or on the edge not on a vertex.
-            bool4 unpiercedEdgesValids = math.select(edgePreciseDotEdgeNormals <= 0f, vertexValids, isEdgeStart | isEdgeEnd);
+            bool4 unpiercedEdgesValids =
+    ((isEdgeStart | isEdgeEnd) & vertexValids) |
+    (!(isEdgeStart | isEdgeEnd) & (edgePreciseDotEdgeNormals <= 0f));
             // Edge hitpoints when the capsule axis pierces are only valid if the hitpoint is not on an edge endpoint.
             bool4 piercedEdgesValids = !(isEdgeStart | isEdgeEnd | isAxisStart | isAxisEnd);
-            bool4 edgeValids         = math.select(unpiercedEdgesValids, piercedEdgesValids, pierced);
+            bool4 edgeValids =
+    (pierced & piercedEdgesValids) |
+    (!pierced & unpiercedEdgesValids);
 
             bool faceValid = aFaceValid || bFaceValid;
             // If rounding causes us to rule out all candidates, make all edges candidates

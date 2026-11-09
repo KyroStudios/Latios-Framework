@@ -315,12 +315,10 @@ namespace Latios.Kinemation
         public UnsafeHashMap<BatchMeshID, int>     meshIdToRmaIndex;
         public UnsafeHashMap<BatchMaterialID, int> materialIdToRmaIndex;
         public uint4                               hash128;
-        public int                                 version;
 
         public BrgRenderMeshArrayIdToIndexMaps(in BRGRenderMeshArray brgRenderMeshArray, AllocatorManager.AllocatorHandle allocator)
         {
             hash128 = brgRenderMeshArray.Hash128;
-            version = brgRenderMeshArray.Version;
 
             // Duplicates resolve to the first index. Null IDs are failed registrations and are omitted.
             meshIdToRmaIndex = new UnsafeHashMap<BatchMeshID, int>(math.max(brgRenderMeshArray.UniqueMeshes.Length, 1), allocator);
@@ -339,7 +337,8 @@ namespace Latios.Kinemation
             }
         }
 
-        public bool Matches(in BRGRenderMeshArray brgRenderMeshArray) => version == brgRenderMeshArray.Version && hash128.Equals(brgRenderMeshArray.Hash128);
+        public bool Matches(in BRGRenderMeshArray brgRenderMeshArray) =>
+    hash128.Equals(brgRenderMeshArray.Hash128);
 
         public void Dispose()
         {

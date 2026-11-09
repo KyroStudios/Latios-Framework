@@ -14,7 +14,7 @@ namespace Latios.Psyshock
 
         public static bool WithinDistance(float3 point, in CapsuleCollider capsule, in RigidTransform capsuleTransform, float maxDistance)
         {
-            var pointInCapSpace = math.InverseTransformFast(in capsuleTransform, point);
+            var pointInCapSpace = MathematicsExtensions.InverseTransformFast(in capsuleTransform, point);
             return PointCapsuleWithin(pointInCapSpace, in capsule, maxDistance);
         }
 
@@ -193,7 +193,7 @@ namespace Latios.Psyshock
             // Find best result
             fraction = math.select(capFraction, cylinderFraction, useCylinderHit);
             normal   = simd.select(capNormal, cylinderNormal, useCylinderHit);
-            return math.select(hitCap, hitCylinder, useCylinderHit);
+            return (useCylinderHit & hitCylinder) | (!useCylinderHit & hitCap);
         }
 
         internal static float3 CapsuleNormalFromFeatureCode(ushort featureCode, in CapsuleCollider capsule, float3 csoOutwardDir)
