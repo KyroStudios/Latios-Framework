@@ -22,7 +22,7 @@ namespace Latios.Psyshock
                                           in RigidTransform bTransform,
                                           float maxDistance)
         {
-            var BinASpaceTransform = math.InverseTransformFast(in aTransform, in bTransform);
+            var BinASpaceTransform = MathematicsExtensions.InverseTransformFast(in aTransform, in bTransform);
             var bInASpaceA         = math.transform(BinASpaceTransform, capsuleB.pointA);
             var bInASpaceB         = math.transform(BinASpaceTransform, capsuleB.pointB);
 

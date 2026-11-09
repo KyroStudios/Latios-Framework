@@ -103,10 +103,11 @@ namespace Unity.Entities.Exposed
         }
 
         // Todo: Find a better home
+        #if UNITY_6000_3_OR_NEWER
+        public static UnityEngine.EntityId EntityId<T>(this UnityObjectRef<T> unityObjectRef) where T : UnityEngine.Object => unityObjectRef.EntityId();
+        #else
         public static int InstanceID<T>(this UnityObjectRef<T> unityObjectRef) where T : UnityEngine.Object => unityObjectRef.Id.instanceId;
-#if UNITY_6000_3_OR_NEWER
-        public static UnityEngine.EntityId EntityId<T>(this UnityObjectRef<T> unityObjectRef) where T : UnityEngine.Object => unityObjectRef.Id.instanceId;
-#endif
+        #endif
 
         public static Entity GetEntity(this SystemHandle systemHandle) => systemHandle.m_Entity;
 

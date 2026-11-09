@@ -69,6 +69,7 @@ namespace Latios
             }
         }
 
+        [System.Runtime.InteropServices.UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
         public delegate void OnPlayback(ref Context context);
 
         /// <summary>

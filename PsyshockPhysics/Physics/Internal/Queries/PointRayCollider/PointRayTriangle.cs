@@ -9,13 +9,13 @@ namespace Latios.Psyshock
     {
         public static bool AreOverlapping(float3 point, in TriangleCollider triangle, in RigidTransform triangleTransform)
         {
-            var pointInTriangleSpace = math.InverseTransformFast(in triangleTransform, point);
+            var pointInTriangleSpace = MathematicsExtensions.InverseTransformFast(in triangleTransform, point);
             return PointTriangleOverlapping(pointInTriangleSpace, in triangle);
         }
 
         public static bool WithinDistance(float3 point, in TriangleCollider triangle, in RigidTransform triangleTransform, float maxDistance)
         {
-            var pointInTriangleSpace = math.InverseTransformFast(in triangleTransform, point);
+            var pointInTriangleSpace = MathematicsExtensions.InverseTransformFast(in triangleTransform, point);
             return PointTriangleWithin(pointInTriangleSpace, triangle.AsSimdFloat3(), maxDistance);
         }
 

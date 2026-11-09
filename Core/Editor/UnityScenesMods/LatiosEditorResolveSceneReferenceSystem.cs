@@ -43,7 +43,7 @@ namespace Unity.Scenes
     {
         struct AssetDependencyTrackerState : ICleanupComponentData
         {
-            public UnityEditor.GUID SceneAndBuildConfigGUID;
+            public UnityEngine.GUID SceneAndBuildConfigGUID;
         }
 
         EntityQuery m_AddScenes;
@@ -167,48 +167,82 @@ namespace Unity.Scenes
 
             _SceneHeaderUtility.CleanupHeaders(EntityManager);
 
+            
             bool headerLoadInProgress = false;
-            Entities.WithStructuralChanges().WithNone<DisableSceneResolveAndLoad, ResolvedSectionEntity>().ForEach(
-                (Entity sceneEntity, ref RequestSceneHeader requestHeader, ref SceneReference scene,
-                 ref ResolvedSceneHash resolvedSceneHash, ref RequestSceneLoaded requestSceneLoaded) =>
+
+            var headerLoadQuery = GetEntityQuery(
+                ComponentType.ReadWrite<RequestSceneHeader>(),
+                ComponentType.ReadWrite<SceneReference>(),
+                ComponentType.ReadWrite<ResolvedSceneHash>(),
+                ComponentType.ReadWrite<RequestSceneLoaded>(),
+                ComponentType.Exclude<DisableSceneResolveAndLoad>(),
+                ComponentType.Exclude<ResolvedSectionEntity>()
+            );
+
+            using (var sceneEntities = headerLoadQuery.ToEntityArray(Allocator.Temp))
             {
-                if (!requestHeader.IsCompleted)
+                foreach (var sceneEntity in sceneEntities)
                 {
-                    if ((requestSceneLoaded.LoadFlags & SceneLoadFlags.BlockOnImport) == 0)
-                    {
-                        headerLoadInProgress = true;
-                        return;
-                    }
-                    requestHeader.Complete();
-                }
+                    var requestHeader = EntityManager.GetComponentData<RequestSceneHeader>(sceneEntity);
+                    var scene = EntityManager.GetComponentData<SceneReference>(sceneEntity);
+                    var requestSceneLoaded = EntityManager.GetComponentData<RequestSceneLoaded>(sceneEntity);
 
-                var headerLoadResult = SceneHeaderUtility.FinishHeaderLoad(requestHeader, scene.SceneGUID, SceneSystem.SceneLoadDir);
-                LogResolving($"Finished header load: {scene.SceneGUID}");
-                if (!headerLoadResult.Success)
-                {
+                    if (!requestHeader.IsCompleted)
+                    {
+                        if ((requestSceneLoaded.LoadFlags & SceneLoadFlags.BlockOnImport) == 0)
+                        {
+                            headerLoadInProgress = true;
+                            continue;
+                        }
+
+                        requestHeader.Complete();
+                    }
+
+                    var headerLoadResult = SceneHeaderUtility.FinishHeaderLoad(
+                        requestHeader,
+                        scene.SceneGUID,
+                        SceneSystem.SceneLoadDir
+                    );
+
+                    LogResolving($"Finished header load: {scene.SceneGUID}");
+
+                    if (!headerLoadResult.Success)
+                    {
+                        requestHeader.Dispose();
+                        EntityManager.AddBuffer<ResolvedSectionEntity>(sceneEntity);
+                        EntityManager.RemoveComponent<RequestSceneHeader>(sceneEntity);
+                        continue;
+                    }
+
+                    ResolveSceneSectionUtility.ResolveSceneSections(
+                        EntityManager,
+                        sceneEntity,
+                        requestSceneLoaded,
+                        ref headerLoadResult.SceneMetaData.Value,
+                        m_ResolveSceneSectionArchetypes,
+                        headerLoadResult.SectionPaths,
+                        headerLoadResult.HeaderBlobOwner
+                    );
+
                     requestHeader.Dispose();
-                    EntityManager.AddBuffer<ResolvedSectionEntity>(sceneEntity);
                     EntityManager.RemoveComponent<RequestSceneHeader>(sceneEntity);
-                    return;
-                }
 
-                ResolveSceneSectionUtility.ResolveSceneSections(EntityManager, sceneEntity, requestSceneLoaded, ref headerLoadResult.SceneMetaData.Value,
-                                                                m_ResolveSceneSectionArchetypes, headerLoadResult.SectionPaths, headerLoadResult.HeaderBlobOwner);
-                requestHeader.Dispose();
-                EntityManager.RemoveComponent<RequestSceneHeader>(sceneEntity);
-#if UNITY_EDITOR
-                if (EntityManager.HasComponent<SubScene>(sceneEntity))
-                {
-                    var subScene = EntityManager.GetComponentObject<SubScene>(sceneEntity);
-                    // Add SubScene component to section entities
-                    using (var sectionEntities = EntityManager.GetBuffer<ResolvedSectionEntity>(sceneEntity).ToNativeArray(Allocator.Temp))
+            #if UNITY_EDITOR
+                    if (EntityManager.HasComponent<SubScene>(sceneEntity))
                     {
-                        for (int iSection = 0; iSection < sectionEntities.Length; ++iSection)
-                            EntityManager.AddComponentObject(sectionEntities[iSection].SectionEntity, subScene);
+                        var subScene = EntityManager.GetComponentObject<SubScene>(sceneEntity);
+
+                        // Add SubScene component to section entities
+                        using (var sectionEntities = EntityManager.GetBuffer<ResolvedSectionEntity>(sceneEntity).ToNativeArray(Allocator.Temp))
+                        {
+                            for (int iSection = 0; iSection < sectionEntities.Length; ++iSection)
+                                EntityManager.AddComponentObject(sectionEntities[iSection].SectionEntity, subScene);
+                        }
                     }
+            #endif
                 }
-#endif
-            }).Run();
+            }
+
 
             if (headerLoadInProgress)
                 EditorUpdateUtility.EditModeQueuePlayerLoopUpdate();

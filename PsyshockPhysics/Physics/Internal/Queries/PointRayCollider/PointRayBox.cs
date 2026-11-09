@@ -9,20 +9,20 @@ namespace Latios.Psyshock
     {
         public static bool AreOverlapping(float3 point, in BoxCollider box, in RigidTransform boxTransform)
         {
-            var pointInBoxSpace = math.InverseTransformFast(in boxTransform, point);
+            var pointInBoxSpace = MathematicsExtensions.InverseTransformFast(in boxTransform, point);
             var clampedPoint    = math.clamp(pointInBoxSpace, box.center - box.halfSize, box.center + box.halfSize);
             return pointInBoxSpace.Equals(clampedPoint);
         }
 
         public static bool WithinDistance(float3 point, in BoxCollider box, in RigidTransform boxTransform, float maxDistance)
         {
-            var pointInBoxSpace = math.InverseTransformFast(in boxTransform, point);
+            var pointInBoxSpace = MathematicsExtensions.InverseTransformFast(in boxTransform, point);
             return PointBoxWithin(pointInBoxSpace, in box, maxDistance);
         }
 
         public static bool DistanceBetween(float3 point, in BoxCollider box, in RigidTransform boxTransform, float maxDistance, out PointDistanceResult result)
         {
-            var  pointInBoxSpace = math.InverseTransformFast(in boxTransform, point);
+            var  pointInBoxSpace = MathematicsExtensions.InverseTransformFast(in boxTransform, point);
             bool hit             = PointBoxDistance(pointInBoxSpace, in box, maxDistance, out var localResult);
             result               = new PointDistanceResult
             {

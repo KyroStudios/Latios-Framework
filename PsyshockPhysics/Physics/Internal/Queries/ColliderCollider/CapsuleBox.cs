@@ -21,7 +21,7 @@ namespace Latios.Psyshock
                                           in RigidTransform capsuleTransform,
                                           float maxDistance)
         {
-            var capInBoxSpaceTransform = math.InverseTransformFast(in boxTransform, in capsuleTransform);
+            var capInBoxSpaceTransform = MathematicsExtensions.InverseTransformFast(in boxTransform, in capsuleTransform);
             var capsuleInBoxSpace      = new CapsuleCollider(math.transform(capInBoxSpaceTransform, capsule.pointA),
                                                              math.transform(capInBoxSpaceTransform, capsule.pointB),
                                                              capsule.radius);
@@ -35,7 +35,7 @@ namespace Latios.Psyshock
                                            float maxDistance,
                                            out ColliderDistanceResult result)
         {
-            var capInBoxSpaceTransform = math.InverseTransformFast(in boxTransform, in capsuleTransform);
+            var capInBoxSpaceTransform = MathematicsExtensions.InverseTransformFast(in boxTransform, in capsuleTransform);
             var capsuleInBoxSpace      = new CapsuleCollider(math.transform(capInBoxSpaceTransform, capsule.pointA),
                                                              math.transform(capInBoxSpaceTransform, capsule.pointB),
                                                              capsule.radius);
@@ -58,10 +58,10 @@ namespace Latios.Psyshock
                 return false;
             }
 
-            var casterInTargetSpace         = math.InverseTransformFast(in targetBoxTransform, castStart);
+            var casterInTargetSpace         = MathematicsExtensions.InverseTransformFast(in targetBoxTransform, castStart);
             var inflatedBoxAabb             = new Aabb(targetBox.center - targetBox.halfSize - capsuleToCast.radius, targetBox.center + targetBox.halfSize + capsuleToCast.radius);
             var castDisplacement            = castEnd - castStart.pos;
-            var transformedCastDisplacement = math.InverseRotateFast(targetBoxTransform.rot, castDisplacement);
+            var transformedCastDisplacement = MathematicsExtensions.InverseRotateFast(targetBoxTransform.rot, castDisplacement);
 
             var  startA    = math.transform(casterInTargetSpace, capsuleToCast.pointA);
             var  rayA      = new Ray(startA, startA + transformedCastDisplacement);
@@ -157,10 +157,10 @@ namespace Latios.Psyshock
                 return false;
             }
 
-            var targetInCasterSpace         = math.InverseTransformFast(castStart, targetCapsuleTransform);
+            var targetInCasterSpace         = MathematicsExtensions.InverseTransformFast(castStart, targetCapsuleTransform);
             var inflatedBoxAabb             = new Aabb(boxToCast.center - boxToCast.halfSize - targetCapsule.radius, boxToCast.center + boxToCast.halfSize + targetCapsule.radius);
             var castDisplacement            = castEnd - castStart.pos;
-            var transformedCastDisplacement = math.InverseRotateFast(castStart.rot, castDisplacement);
+            var transformedCastDisplacement = MathematicsExtensions.InverseRotateFast(castStart.rot, castDisplacement);
 
             var  targetA    = math.transform(targetInCasterSpace, targetCapsule.pointA);
             var  rayA       = new Ray(targetA, targetA - transformedCastDisplacement);
@@ -247,7 +247,7 @@ namespace Latios.Psyshock
             UnitySim.ContactsBetweenResult result = default;
             result.contactNormal                  = distanceResult.normalB;
 
-            var boxLocalContactNormal = math.InverseRotateFast(boxTransform.rot, -distanceResult.normalB);
+            var boxLocalContactNormal = MathematicsExtensions.InverseRotateFast(boxTransform.rot, -distanceResult.normalB);
             PointRayBox.BestFacePlanesAndVertices(in box, boxLocalContactNormal, out var edgePlaneNormals, out var edgePlaneDistances, out var plane, out _);
 
             var  bInATransform     = math.mul(math.inverse(boxTransform), capsuleTransform);
@@ -754,10 +754,12 @@ namespace Latios.Psyshock
             float4 scaledProjectionsOnSegmentFromB = math.select(scaledProjectionsOnSegmentYZFromB,
                                                                  scaledProjectionsOnSegmentYZFromB + (edgeVerticesX - segmentB.x) * segment.x,
                                                                  isClampedEdge);
-            bool4 segmentClosestIsInterior = math.select(!infiniteEdgesClosestIsEndpoint,
-                                                         (scaledProjectionsOnSegmentFromA > 0f) & (scaledProjectionsOnSegmentFromB < 0f),
-                                                         isClampedEdge);
-            bool4 segmentClosestIsCloserToB = math.select(infiniteEdgesCloserToB, scaledProjectionsOnSegmentFromA > -scaledProjectionsOnSegmentFromB, isClampedEdge);
+            bool4 segmentClosestIsInterior =
+    (isClampedEdge & (scaledProjectionsOnSegmentFromA > 0f) & (scaledProjectionsOnSegmentFromB < 0f)) |
+    (!isClampedEdge & !infiniteEdgesClosestIsEndpoint);
+            bool4 segmentClosestIsCloserToB =
+    (isClampedEdge & (scaledProjectionsOnSegmentFromA > -scaledProjectionsOnSegmentFromB)) |
+    (!isClampedEdge & infiniteEdgesCloserToB);
 
             fractions              = math.saturate(scaledProjectionsOnSegmentFromA / projectionOnSegmentLengthSq);
             float4 closestOnEdgesX = math.select(math.clamp(segmentA.x + segment.x * fractions, -axisHalfSize, axisHalfSize), edgeVerticesX, isClampedEdge);

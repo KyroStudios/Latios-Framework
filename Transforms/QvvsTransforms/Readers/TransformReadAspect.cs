@@ -269,7 +269,7 @@ namespace Latios.Transforms
         /// This version discards the bottom row of a typical 4x4 matrix as that row is assumed to be (0, 0, 0, 1).
         /// </summary>
         public float3x4 localMatrix3x4 => hasMutableLocalTransform? localTransform.ToMatrix3x4(stretch) :
-            hasParent? float3x4.Scale(stretch) : worldMatrix3x4;
+            hasParent? Float3x4Extensions.Scale(stretch) : worldMatrix3x4;
         /// <summary>
         /// The matrix that represent's the entity's local transform relative to its parent, or relative to the world if it does not have a parent.
         /// Stretch is included.
@@ -281,7 +281,7 @@ namespace Latios.Transforms
         /// This version discards the bottom row of a typical 4x4 matrix as that row is assumed to be (0, 0, 0, 1).
         /// </summary>
         public float3x4 inverseLocalMatrix3x4 => hasMutableLocalTransform? localTransform.ToInverseMatrix3x4(stretch) :
-            hasParent? float3x4.Scale(math.rcp(stretch)) : inverseWorldMatrix3x4;
+            hasParent? Float3x4Extensions.Scale(math.rcp(stretch)) : inverseWorldMatrix3x4;
         /// <summary>
         /// The inverse of localMatrix4x4, computed directly from the QVS or QVVS data. Stretch is included.
         /// </summary>
@@ -292,7 +292,7 @@ namespace Latios.Transforms
         /// This version discards the bottom row of a typical 4x4 matrix as that row is assumed to be (0, 0, 0, 1).
         /// </summary>
         public float3x4 inverseLocalMatrix3x4IgnoreStretch => hasMutableLocalTransform? localTransform.ToInverseMatrix3x4() :
-            hasParent ? float3x4.identity : inverseWorldMatrix3x4IgnoreStretch;
+            hasParent ? Float3x4Extensions.identity : inverseWorldMatrix3x4IgnoreStretch;
         /// <summary>
         /// The inverse of localMatrix4x4, computed directly from the QVS or QVVS data, except stretch is ignored.
         /// </summary>

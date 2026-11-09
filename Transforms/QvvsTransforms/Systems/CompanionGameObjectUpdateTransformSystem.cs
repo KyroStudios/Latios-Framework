@@ -32,7 +32,11 @@ namespace Latios.Transforms.Systems
         struct IndexAndInstance
         {
             public int transformAccessArrayIndex;
+        #if UNITY_6000_3_OR_NEWER
+            public UnityEngine.EntityId instanceID;
+        #else
             public int instanceID;
+        #endif
         }
 
         TransformAccessArray                    m_transformAccessArray;
@@ -80,12 +84,12 @@ namespace Latios.Transforms.Systems
                         {
                             IndexAndInstance indexAndInstance          = default;
                             indexAndInstance.transformAccessArrayIndex = m_entities.Length;
-                            indexAndInstance.instanceID                = link.CompanionTransform.InstanceID();
+                            indexAndInstance.instanceID                = link.CompanionTransform.EntityId();
                             m_entitiesMap.Add(entity, indexAndInstance);
 #if UNITY_6000_3_OR_NEWER
                             m_transformAccessArray.Add(link.CompanionTransform.EntityId());
 #else
-                            m_transformAccessArray.Add(link.CompanionTransform.InstanceID());
+                            m_transformAccessArray.Add(link.CompanionTransform.EntityId());
 #endif
                             m_entities.Add(entity);
                         }
@@ -116,7 +120,7 @@ namespace Latios.Transforms.Systems
                 foreach (var (link, entity) in Query<CompanionLinkTransform>().WithChangeFilter<CompanionLink>().WithEntityAccess())
                 {
                     var cached    = m_entitiesMap[entity];
-                    var currentID = link.CompanionTransform.InstanceID();
+                    var currentID = link.CompanionTransform.EntityId();
                     if (cached.instanceID != currentID)
                     {
                         // We avoid the need to update the indices and reorder the entities array by adding
@@ -128,7 +132,7 @@ namespace Latios.Transforms.Systems
 #if UNITY_6000_3_OR_NEWER
                         m_transformAccessArray.Add(link.CompanionTransform.EntityId());
 #else
-                        m_transformAccessArray.Add(link.CompanionTransform.InstanceID());
+                        m_transformAccessArray.Add(link.CompanionTransform.EntityId());
 #endif
                         m_transformAccessArray.RemoveAtSwapBack(cached.transformAccessArrayIndex);
                         cached.instanceID     = currentID;

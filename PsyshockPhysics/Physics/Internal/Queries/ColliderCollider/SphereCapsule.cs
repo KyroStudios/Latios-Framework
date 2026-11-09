@@ -21,7 +21,7 @@ namespace Latios.Psyshock
                                           in RigidTransform sphereTransform,
                                           float maxDistance)
         {
-            var    sphereInCapSpaceTransform = math.InverseTransformFast(in capsuleTransform, in sphereTransform);
+            var    sphereInCapSpaceTransform = MathematicsExtensions.InverseTransformFast(in capsuleTransform, in sphereTransform);
             float3 sphereCenterInCapSpace    = math.transform(sphereInCapSpaceTransform, sphere.center);
             return PointRayCapsule.PointCapsuleWithin(sphereCenterInCapSpace, in capsule, sphere.radius + maxDistance);
         }

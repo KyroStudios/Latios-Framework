@@ -23,6 +23,7 @@ namespace Latios.Unsafe.InternalSourceGen
             };
         }
 
+        [System.Runtime.InteropServices.UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
         public delegate void BurstDispatchVptrDelegate(ContextPtr context, int operation);
 
         public unsafe struct VPtr

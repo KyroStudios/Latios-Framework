@@ -21,7 +21,7 @@ namespace Latios.Psyshock
                                           float maxDistance)
         {
             var    sphereCenterInWorldBoxRelative = sphereTransform.pos - boxTransform.pos + math.rotate(sphereTransform.rot, sphere.center);
-            float3 sphereCenterInBoxSpace         = math.InverseRotateFast(boxTransform.rot, sphereCenterInWorldBoxRelative);
+            float3 sphereCenterInBoxSpace         = MathematicsExtensions.InverseRotateFast(boxTransform.rot, sphereCenterInWorldBoxRelative);
             Unity.Burst.CompilerServices.Hint.Assume(sphere.radius >= 0f);
             return PointRayBox.PointBoxWithin(sphereCenterInBoxSpace, in box, maxDistance + sphere.radius);
         }
@@ -34,7 +34,7 @@ namespace Latios.Psyshock
                                            out ColliderDistanceResult result)
         {
             var            sphereCenterInWorldBoxRelative = sphereTransform.pos - boxTransform.pos + math.rotate(sphereTransform.rot, sphere.center);
-            float3         sphereCenterInBoxSpace         = math.InverseRotateFast(boxTransform.rot, sphereCenterInWorldBoxRelative);
+            float3         sphereCenterInBoxSpace         = MathematicsExtensions.InverseRotateFast(boxTransform.rot, sphereCenterInWorldBoxRelative);
             SphereCollider sphereInBoxSpace               = new SphereCollider(sphereCenterInBoxSpace, sphere.radius);
             bool           hit                            = BoxSphereDistance(in box,
                                                                     in sphereInBoxSpace,
@@ -65,8 +65,8 @@ namespace Latios.Psyshock
             // Move everything relative to the target box before transforming to box space.
             var  sphereCenter     = castStart.pos - targetBoxTransform.pos + math.rotate(castStart.rot, sphereToCast.center);
             var  castDisplacement = castEnd - castStart.pos;
-            var  rayStart         = math.InverseRotateFast(targetBoxTransform.rot, sphereCenter);
-            var  ray              = new Ray(rayStart, rayStart + math.InverseRotateFast(targetBoxTransform.rot, castDisplacement));
+            var  rayStart         = MathematicsExtensions.InverseRotateFast(targetBoxTransform.rot, sphereCenter);
+            var  ray              = new Ray(rayStart, rayStart + MathematicsExtensions.InverseRotateFast(targetBoxTransform.rot, castDisplacement));
             bool hit              = PointRayBox.RaycastRoundedBox(in ray, in targetBox, sphereToCast.radius, out var fraction, out var roundedNormal, out var featureNormal);
             if (hit)
             {
@@ -95,8 +95,8 @@ namespace Latios.Psyshock
         {
             // Move everything relative to the cast start before transforming to caster space and reversing the cast direction
             var  sphereCenter = targetSphereTransform.pos - castStart.pos + math.rotate(targetSphereTransform.rot, targetSphere.center);
-            var  rayStart     = math.InverseRotateFast(castStart.rot, sphereCenter);
-            var  ray          = new Ray(rayStart, rayStart + math.InverseRotateFast(castStart.rot, castStart.pos - castEnd));
+            var  rayStart     = MathematicsExtensions.InverseRotateFast(castStart.rot, sphereCenter);
+            var  ray          = new Ray(rayStart, rayStart + MathematicsExtensions.InverseRotateFast(castStart.rot, castStart.pos - castEnd));
             bool hit          = PointRayBox.RaycastRoundedBox(in ray, in boxToCast, targetSphere.radius, out var fraction, out var roundedNormal, out var featureNormal);
             if (hit)
             {

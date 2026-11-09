@@ -1,4 +1,4 @@
-﻿using Latios.Transforms;
+using Latios.Transforms;
 using Unity.Mathematics;
 
 namespace Latios.Psyshock
@@ -102,7 +102,7 @@ namespace Latios.Psyshock
         {
             // Transforming the start and endpoints is slightly more precise, at the cost of a few cycles,
             // because this method is typically used to move from large coordinates to smaller coordinates.
-            return new Ray(math.InverseTransformFast(in transform, ray.start), math.InverseTransformFast(in transform, ray.end));
+            return new Ray(MathematicsExtensions.InverseTransformFast(in transform, ray.start), MathematicsExtensions.InverseTransformFast(in transform, ray.end));
         }
 
         /// <summary>
